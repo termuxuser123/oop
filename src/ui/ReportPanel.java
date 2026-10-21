@@ -24,6 +24,8 @@ public class ReportPanel extends JPanel {
         // text area to show summary output
         repoarea = new JTextArea();
         repoarea.setEditable(false);
+        repoarea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+        repoarea.setMargin(new Insets(10, 10, 10, 10));
         JScrollPane sp = new JScrollPane(repoarea);
 
         // top bar with refresh button

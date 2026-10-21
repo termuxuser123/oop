@@ -68,6 +68,20 @@ public class TransactionDAOImpl implements TransactionDAO {
     }
 
     @Override
+    public List<IssueTransaction> findAllActive() throws SQLException {
+        String sql = "SELECT * FROM transactions WHERE status = 'ISSUED'";
+        List<IssueTransaction> list = new ArrayList<>();
+        try (Connection con = DBConnectionManager.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(IssueTransaction.fromResultSet(rs));
+            }
+        }
+        return list;
+    }
+
+    @Override
     public IssueTransaction findById(int txnId) throws SQLException {
         String sql = "SELECT * FROM transactions WHERE txn_id = ?";
         try (Connection con = DBConnectionManager.getConnection();

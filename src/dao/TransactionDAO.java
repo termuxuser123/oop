@@ -16,5 +16,7 @@ public interface TransactionDAO {
 
     public List<IssueTransaction> findActiveByUser(int userId) throws SQLException;
 
+    public List<IssueTransaction> findAllActive() throws SQLException;
+
     public IssueTransaction findById(int txnId) throws SQLException;
 }

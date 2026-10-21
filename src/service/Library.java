@@ -38,6 +38,17 @@ public class Library implements Borrowable, Searchable, Reportable {
         } catch (SQLException e) {
             System.err.println("[LIBRARY INIT] Could not load books: " + e.getMessage());
         }
+        try {
+            for (IssueTransaction txn : txnDAO.findAllActive()) {
+                if (txn.getUser() != null && txn.getBook() != null) {
+                    activeLoans.put(getLoanKey(txn.getUser(), txn.getBook()), txn);
+                    userLoanCounts.put(txn.getUser().getId(),
+                            userLoanCounts.getOrDefault(txn.getUser().getId(), 0) + 1);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("[LIBRARY INIT] Could not load active loans: " + e.getMessage());
+        }
     }
 
 
@@ -173,6 +184,17 @@ public class Library implements Borrowable, Searchable, Reportable {
         String loanKey = getLoanKey(user, item);
         IssueTransaction issueTxn = activeLoans.get(loanKey);
         if (issueTxn == null) {
+            try {
+                for (IssueTransaction t : txnDAO.findActiveByUser(user.getId())) {
+                    if (t.getBook() != null && t.getBook().getIsbn().equals(item.getIsbn())) {
+                        issueTxn = t;
+                        activeLoans.put(loanKey, issueTxn);
+                        break;
+                    }
+                }
+            } catch (SQLException ignored) {}
+        }
+        if (issueTxn == null) {
             System.out.println("[RETURN ERROR] No active loan found for " + user.getName()
                     + " and '" + item.getTitle() + "'.");
             return;
@@ -265,7 +287,33 @@ public class Library implements Borrowable, Searchable, Reportable {
 
     @Override
     public String generateSummary() {
-        return String.format("=== Library Summary ===\nTotal Catalog Items: %d\nActive Loans: %d",
-                inventory.size(), activeLoans.size());
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== Library Summary & Audit Report ===\n");
+        sb.append("Total Catalog Items: ").append(inventory.size()).append("\n");
+        sb.append("Active Loans: ").append(activeLoans.size()).append("\n\n");
+
+        sb.append("--- Active Loans Details ---\n");
+        if (activeLoans.isEmpty()) {
+            sb.append("No active loans at this time.\n");
+        } else {
+            LocalDate today = LocalDate.now();
+            int idx = 1;
+            for (IssueTransaction txn : activeLoans.values()) {
+                String title = (txn.getBook() != null) ? txn.getBook().getTitle() : "Unknown";
+                String isbn = (txn.getBook() != null) ? txn.getBook().getIsbn() : "N/A";
+                String uname = (txn.getUser() != null) ? txn.getUser().getName() : "Unknown";
+                String role = (txn.getUser() != null) ? txn.getUser().getRole() : "";
+                LocalDate due = txn.getDueDate();
+                long overdue = (due != null) ? java.time.temporal.ChronoUnit.DAYS.between(due, today) : 0;
+                String status = (overdue > 0) ? ("OVERDUE (" + overdue + " days)") : "ACTIVE";
+
+                sb.append(String.format("[%d] %s (ISBN: %s)\n", idx++, title, isbn));
+                sb.append(String.format("    Borrower: %s (%s, ID: %d)\n",
+                        uname, role, (txn.getUser() != null ? txn.getUser().getId() : 0)));
+                sb.append(String.format("    Issue Date: %s | Due Date: %s | Status: %s\n\n",
+                        txn.getIssueDate(), due, status));
+            }
+        }
+        return sb.toString();
     }
 }

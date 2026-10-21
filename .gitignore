@@ -1,0 +1,5 @@
+out/
+*.class
+*.tmp
+sources.txt
+src/database/mysql-connector-j-26.7.0/

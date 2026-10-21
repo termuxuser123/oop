@@ -50,6 +50,9 @@ public class DashboardFrame extends JFrame {
         if (u.getMaxBookAllowed() > 0) {
             tp.addTab("Borrow / Return", new IssueReturnPanel(u, lib, lib));
             tp.addTab("My Loans", new LoansPanel(u));
+        } else {
+            // admin tabs
+            tp.addTab("Manage Books", new ManageBooksPanel(lib));
         }
 
         tp.addTab("Reports", new ReportPanel(lib));

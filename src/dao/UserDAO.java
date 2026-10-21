@@ -15,4 +15,8 @@ public interface UserDAO {
     public void deleteById(int id) throws SQLException;
 
     public void update(User user) throws SQLException;
+
+    public List<User> getPendingUsers() throws SQLException;
+
+    public void updateStatus(int userId, String status) throws SQLException;
 }

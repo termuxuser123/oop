@@ -12,11 +12,14 @@ import model.Student;
 import model.Admin;
 import model.Faculty;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mindrot.jbcrypt.BCrypt;
 
 public class UserDAOImpl implements UserDAO {
     public void insert(User user) throws SQLException {
-        String query = "INSERT INTO users (name, email, role, contact, password_hash) VALUES(?,?,?,?,?)";
+        String query = "INSERT INTO users (name, email, role, contact, password_hash, status) VALUES(?,?,?,?,?,'PENDING')";
         try (Connection con = DBConnectionManager.getConnection();
                 PreparedStatement pstmt = con.prepareStatement(query)) {
             pstmt.setString(1, user.getName());
@@ -41,6 +44,13 @@ public class UserDAOImpl implements UserDAO {
                     if (!BCrypt.checkpw(pass, password)) {
                         return null;
                     } else {
+                        String status = rs.getString("status");
+                        if ("PENDING".equals(status)) {
+                            throw new SQLException("Your registration is awaiting admin approval.");
+                        }
+                        if ("REJECTED".equals(status)) {
+                            throw new SQLException("Your registration was not approved. Please contact the library admin.");
+                        }
                         String name = rs.getString("name");
                         String role = rs.getString("role");
                         int id = rs.getInt("user_id");
@@ -165,5 +175,37 @@ public class UserDAOImpl implements UserDAO {
             ps.executeUpdate();
         }
     }
+    
+    public List<User> getPendingUsers() throws SQLException {
+        String query = "SELECT * FROM users WHERE status='PENDING' ORDER BY user_id";
+        List<User> list = new ArrayList<>();
+        try (Connection con = DBConnectionManager.getConnection();
+                PreparedStatement pstmt = con.prepareStatement(query);
+                ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                int id = rs.getInt("user_id");
+                String name = rs.getString("name");
+                String email = rs.getString("email");
+                String role = rs.getString("role");
+                String contact = rs.getString("contact");
+                String password = rs.getString("password_hash");
+                if (role.equals("FACULTY")) {
+                    list.add(new Faculty(name, email, id, contact, password));
+                } else {
+                    list.add(new Student(name, email, id, contact, password));
+                }
+            }
+        }
+        return list;
+    }
 
+    public void updateStatus(int userId, String status) throws SQLException {
+        String sql = "UPDATE users SET status=? WHERE user_id=? AND status='PENDING'";
+        try (Connection con = DBConnectionManager.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        }
+    }
 }

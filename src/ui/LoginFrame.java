@@ -47,6 +47,8 @@ public class LoginFrame extends JFrame {
                 }
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
             }
         });
 

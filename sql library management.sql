@@ -1,7 +1,7 @@
 DROP DATABASE IF EXISTS library_db;
 CREATE DATABASE library_db;
 USE library_db;
-CREATE TABLE users(user_id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100) NOT NULL, email VARCHAR(150) NOT NULL UNIQUE, role VARCHAR(30) NOT NULL, password_hash VARCHAR(255) NOT NULL, contact VARCHAR(20) NOT NULL);
+CREATE TABLE users(user_id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100) NOT NULL, email VARCHAR(150) NOT NULL UNIQUE, role VARCHAR(30) NOT NULL, password_hash VARCHAR(255) NOT NULL, contact VARCHAR(20) NOT NULL, status VARCHAR(20) NOT NULL DEFAULT 'APPROVED');
 
 CREATE TABLE books(isbn VARCHAR(20) PRIMARY KEY, title VARCHAR(200) NOT NULL, author VARCHAR(150) NOT NULL, type VARCHAR(50) NOT NULL, total_copies INT NOT NULL, available_copies INT NOT NULL, shelf_location VARCHAR(50), 
 CHECK (total_copies>=0), CHECK (available_copies>=0), CHECK (available_copies <= total_copies));
@@ -16,11 +16,12 @@ CREATE TABLE waitlist(isbn VARCHAR(20) NOT NULL, user_id INT NOT NULL, request_d
 PRIMARY KEY(isbn, user_id), FOREIGN KEY (isbn) REFERENCES books(isbn), FOREIGN KEY(user_id) REFERENCES users(user_id));
 
 INSERT INTO users
-    (name, email, role, password_hash, contact)
+    (name, email, role, password_hash, contact, status)
 VALUES
-    ('Ananya', 'ananya@example.com', 'STUDENT', 'demo_hash_1', '9876543210'),
-    ('Rahul', 'rahul@example.com', 'STUDENT', 'demo_hash_2', '9876543211'),
-    ('Admin', 'admin@example.com', 'ADMIN', 'demo_hash_3', '9876543212');
+    ('Ananya', 'ananya@example.com', 'STUDENT', '$2a$10$/qTzR0RBdPwlbr4hCiEEQ.nuC7PeUt.Pd7zyTgXFAjrmX/pPPOS3C', '9876543210', 'APPROVED'),
+    ('Rahul', 'rahul@example.com', 'STUDENT', '$2a$10$/qTzR0RBdPwlbr4hCiEEQ.nuC7PeUt.Pd7zyTgXFAjrmX/pPPOS3C', '9876543211', 'APPROVED'),
+    ('Admin', 'admin@example.com', 'ADMIN', '$2a$10$FgZDV5yI444hhyuNhTKE/./vUG.tVQhecbgyiwUzOx71SJpGgjKhy', '9876543212', 'APPROVED');
+-- Note: Default password for Student accounts is 'pass123', and for Admin is 'admin'
 
 INSERT INTO books
     (isbn, title, author, type, total_copies,

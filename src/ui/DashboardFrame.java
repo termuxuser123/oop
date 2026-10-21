@@ -53,9 +53,8 @@ public class DashboardFrame extends JFrame {
         } else {
             // admin tabs
             tp.addTab("Manage Books", new ManageBooksPanel(lib));
+            tp.addTab("Reports", new ReportPanel(lib));
         }
-
-        tp.addTab("Reports", new ReportPanel(lib));
 
         add(tp, BorderLayout.CENTER);
 

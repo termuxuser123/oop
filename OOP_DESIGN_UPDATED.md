@@ -94,7 +94,7 @@ Polymorphism allows objects of different types to be treated uniformly through c
   Calling `user.getMaxBookAllowed()` or `user.getLoanPeriod()` dispatches dynamically depending on the runtime user type:
   - `Student`: Max 3 books, 14-day loan duration.
   - `Faculty`: Max 5 books, 30-day loan duration.
-  - `Admin`: 0 books (administrative access only).
+  - `Admin`: Administrative role with inventory management and audit reporting access.
 - **Lending Eligibility per Item Type:**
   Calling `item.isIssuable()`:
   - `TextBook`: Returns `true` (standard issue allowed).
@@ -132,4 +132,11 @@ Polymorphism allows objects of different types to be treated uniformly through c
 3. **Facade Pattern:**
    - Class: `Library.java`
    - Benefit: Exposes a simplified, unified API to the Swing UI layer (`issueBook`, `returnBook`, `searchBooks`, `generateReport`) while coordinating underlying subsystems (DAOs, WaitlistManager, FinePolicy, Transactions).
-   
+
+---
+
+## 5. Viva / Presentation Quick Summary
+
+> **Q: How does this project demonstrate OOP and SOLID?**
+>
+> *"Our Library Management System uses a layered architecture separating UI, Business Service, Persistence (DAO), and Domain Models. We used **Inheritance** and **Polymorphism** to model users (`Student`, `Faculty`, `Admin`) and items (`TextBook`, `ReferenceBook`, `Journal`) with type-specific borrowing constraints and loan periods. State is **Encapsulated** with validation invariants. We adhered to **SOLID** by segregating interfaces (`Searchable`, `Borrowable`, `Reportable`), applying the **Strategy Pattern** for fine calculations (OCP & DIP), maintaining **Single Responsibility** across classes, and ensuring safe subtype substitution (**LSP**)."*

@@ -53,6 +53,7 @@ public class DashboardFrame extends JFrame {
             // admin tabs
             tp.addTab("Manage Books", new ManageBooksPanel(lib));
             tp.addTab("Reports", new ReportPanel(lib));
+            tp.addTab("Pending Registrations", new PendingRegistrationsPanel()); 
         } else {
             // borrower tabs
             tp.addTab("Borrow / Return", new IssueReturnPanel(u, lib, lib));

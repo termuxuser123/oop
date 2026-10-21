@@ -5,7 +5,6 @@ import java.awt.*;
 import java.sql.SQLException;
 import dao.UserDAO;
 import dao.impl.UserDAOImpl;
-import model.Admin;
 import model.Faculty;
 import model.Student;
 import model.User;
@@ -30,7 +29,7 @@ public class RegisterFrame extends JFrame {
         phonetxt = new JTextField(12);
         agespin = new JSpinner(new SpinnerNumberModel(18, 1, 120, 1));
 
-        String[] roles = { "Student", "Faculty", "Admin" };
+        String[] roles = { "Student", "Faculty"};
         rolebox = new JComboBox<>(roles);
         regbtn = new JButton("Register");
 
@@ -66,9 +65,7 @@ public class RegisterFrame extends JFrame {
             // create model instance based on role
             try {
                 User u;
-                if ("Admin".equalsIgnoreCase(role)) {
-                    u = new Admin(name, email, 0, contact, pass);
-                } else if ("Faculty".equalsIgnoreCase(role)) {
+                if ("Faculty".equalsIgnoreCase(role)) {
                     u = new Faculty(name, email, 0, contact, pass);
                 } else {
                     u = new Student(name, email, 0, contact, pass);
@@ -76,7 +73,7 @@ public class RegisterFrame extends JFrame {
 
                 UserDAO udao = new UserDAOImpl();
                 udao.insert(u);
-                JOptionPane.showMessageDialog(this, "Registration successful! You can now log in.", "Success",
+                JOptionPane.showMessageDialog(this, "Registration submitted! You can log in once an admin approves your account.", "Pending Approval",
                         JOptionPane.INFORMATION_MESSAGE);
                 dispose();
             } catch (IllegalArgumentException ex) {

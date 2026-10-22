@@ -111,7 +111,10 @@ public class ManageBooksPanel extends JPanel {
             l.removeItem(isb_val);
             search();
             JOptionPane.showMessageDialog(this, "Book removed.");
-        } catch (Exception ex) {
+        } catch (IllegalStateException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
+            "Book still has copies on loan", JOptionPane.WARNING_MESSAGE);
+        }catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
     }

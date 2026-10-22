@@ -66,9 +66,8 @@ public class Library implements Borrowable, Searchable, Reportable {
     public void removeItem(String isbn) throws SQLException {
         LibraryItem item = findInInventory(isbn);
         if (item != null && item.getAvailableCopies() < item.getTotalCopies()) {
-            System.out.println("[REMOVE ERROR] '" + item.getTitle() + "' still has copies on loan.");
-            return;
-        }
+            throw new IllegalStateException(
+                "Cannot remove '" + item.getTitle() + "': it still has copies on loan.");        }
         waitlistDAO.removeAllForIsbn(isbn);   // waitlist rows reference the book, so first
         bookDAO.deleteByIsbn(isbn);
         inventory.removeIf(b -> b.getIsbn().equals(isbn));
